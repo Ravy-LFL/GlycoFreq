@@ -20,7 +20,10 @@ from Bio.PDB import PDBParser, PDBIO
 import pickle as pkl
 
 parser = argparse.ArgumentParser(prog = 'Glyco if it was actually smart coded',
-                                 description = 'Compute frequence of interaction by carbohydrate on protein, and set it in new PDB structure as b-factor values.')
+                                 description = """Compute frequence of interaction by carbohydrate on protein, and set it in new PDB structure as b-factor values.
+                                 It produce a csv file, indicating which residue interact with which carbohydrate and how many times. The count is raw.
+                                 And as many PDB files as the number of carbohydrates in the topology.
+                                 """)
 parser.add_argument("-top",help="Path to topology file.")
 parser.add_argument("-trj",help="Path to trajectory file.")
 parser.add_argument("-output",help="Path to output file.")
@@ -170,22 +173,26 @@ def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : s
         for chain in model :
             chain_id = chain.get_id()
             for residue in chain :
+                #  Retrieve infos to write the name.
                 resid = residue.get_id()[1]
                 resn = residue.resname
                 segid = residue.segid
                 name = f"{resn}_{resid}_{segid}"
                 if name in new_b_factors[carb].keys() :
                     #  Count percentage of interaction through the simulation.
-                    new_bfs = round((new_b_factors[carb][name]/length_sim)*100,2)
-                    #  If the percentage is greater than 9.90, that means that this residue is probably covalently linked to the carbohydrate.
-                    if new_bfs > 9.90 :
-                        new_bfs = 0.00
+                    new_bfs = (new_b_factors[carb][name]/length_sim)*100
+                    
+                    #  Round the value with three numbers.
+                    new_bfs = round((new_bfs),3)
+                    
                     print(new_bfs)
                 else :
-                    new_bfs = 0.00
+                    #  This value is set for the residues which never interact with carbohydrates.
+                    new_bfs = -1.00
+                #  Set the new
                 for atom in residue :
                     atom.set_bfactor(new_bfs)
-    
+
     #  Save new structure.
     io = PDBIO()
     io.set_structure(structure)
