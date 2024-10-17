@@ -246,7 +246,10 @@ if __name__ == "__main__" :
     full_dict = fullfill_dict(THR, dictionnary,SKIP)
 
     #  Frames number.
-    full_time = (u.trajectory.totaltime)+1
+    if SKIP != 0 :
+        full_time = (u.trajectory.totaltime)+1/SKIP
+    else :
+        full_time = (u.trajectory.totaltime)+1/SKIP
 
     #  Creation of new structure with new b_factors for each carbohydrates?
     for carb in full_dict.keys() :
