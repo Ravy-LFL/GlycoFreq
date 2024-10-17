@@ -59,8 +59,11 @@ You can try the using the files in the **examples** folder as follow :
 And will produce this outputs :
 
 The PDB file colored by PyMol.
+
 ![Alt text](img/example_glyco_mkII.png)
 
 
+
 And the CSV file.
+
 ![Alt text](img/example_csv.png)
