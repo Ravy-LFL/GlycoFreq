@@ -19,7 +19,7 @@ And then :
 ## Usage.
 Once the environment is activated, here the command line to use **Glyco-MKII** :
 
-`./Glyco_MKII.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction>`
+`./Glyco_MKII.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction> -skip (OPTIONAL) <how_many_frames_to_skip>`
     
 ### Arguments.
   - **top** : Indicate the path to the topology file (PDB,GRO,CIF...).
@@ -29,6 +29,9 @@ Once the environment is activated, here the command line to use **Glyco-MKII** :
   - **output** : Indicate the path to the output files. The output files are a csv named **out_count_carbohydrates.csv**, and as much PDB files as number of carbohydrates named **contact_with_<segid_of_carbohydrate>.pdb**
 
   - **threshold** : Indicate the threshold to count a distance as a contact between a heavy atoms of the carbohydrates and the residues.
+
+  - **skip** : Indicate how many frames to skip. **OPTIONAL** 0 by default.
+
 
 **COOL TRICKS ABOUT TRAJECTORY AND TOPOLOGY FILES** :
 
@@ -58,8 +61,10 @@ You can try the using the files in the **examples** folder as follow :
 
 
 And will produce these outputs :
-    - **contact_with_CARA.pdb** : The PDB file with the proportion of interaction as b-factor.
-    - **out_count_carbohydrates.csv** : The CSV file which contains the informations of how many time a residue is in contact with the carbohydrate.
+
+- **contact_with_CARA.pdb** : The PDB file with the proportion of interaction as b-factor.
+
+- **out_count_carbohydrates.csv** : The CSV file which contains the informations of how many time a residue is in contact with the carbohydrate.
 
 These outputs are also in the `examples/results/`.
 
