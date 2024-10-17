@@ -26,7 +26,7 @@ Once the environment is activated, here the command line to use **Glyco-MKII** :
 
   - **trj** : Indicate the path to the trajectory file (XTC,DCD,TRR...).
 
-  - **output** : Indicate the path to the output files.
+  - **output** : Indicate the path to the output files. The output files are a csv named **out_count_carbohydrates.csv**, and as much PDB files as number of carbohydrates named **contact_with_<segid_of_carbohydrate>.pdb**
 
   - **threshold** : Indicate the threshold to count a distance as a contact between a heavy atoms of the carbohydrates and the residues.
 
@@ -54,7 +54,7 @@ Once loaded, to show color the protein depending on the frequency of interaction
 
 You can try the using the files in the **examples** folder as follow :
 
-`./Glyco_MKII.py -top examples/topology_file.pdb -trj examples/trajectory_file.xtc-output . -threshold 8`
+`./Glyco_MKII.py -top examples/topology_file.pdb -trj examples/trajectory_file.xtc -output . -threshold 8`
 
 
 And will produce these outputs :
