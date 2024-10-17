@@ -109,7 +109,7 @@ def fullfill_dict(THR : str, dict_carbs : dict, SKIP : int) :
             dict_carbs : dict
                 Dict of count.
             SKIP : int
-                Number of frame to skip. (default value : 0)
+                Number of frame to skip (not activ here.)
             
         Returns
         -------
@@ -119,31 +119,19 @@ def fullfill_dict(THR : str, dict_carbs : dict, SKIP : int) :
 
     #  Create list of input for carbohydrates.
     input_carbs_list = [u.select_atoms(f"segid {carbs} and not type H") for carbs in dict_carbs.keys()]
-    
+
     #  Select C-alpha from protein.
     protein = u.select_atoms("name CA")
 
-    #  Count for skipping.
-    count = 0
-
     #  Iterate on trajectory.
     for ts in tqdm(u.trajectory) :
-        
-        if SKIP != 0 :
-            #  Will treat every SKIP frames.
-            if count % int(SKIP) != 0 :
-                count += 1
-                continue
-            else :
-                count += 1
-
         #  Iterate on protein atoms.
-        for carbs in input_carbs_list :
+        for atom in protein :
 
             #  Iterate on the different carbohydrates.
-            for atom_car in carbs.atoms :
+            for carbs in input_carbs_list :
                 #  Iterate on each carbohydrate. 
-                for atom in protein.atoms :
+                for atom_car in carbs.atoms :
                     
                     #  Compute distance between both atoms.
                     d = distance_array(atom_car.position,atom.position)[0][0]
