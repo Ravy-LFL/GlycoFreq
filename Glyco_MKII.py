@@ -2,7 +2,7 @@
 
     Usage
     =====
-        ./glyco_diy.py -top <topology_file> -trj <trajectory_file> -output <file_name> -threshold <threshold_interaction>
+        ./glyco_diy.py -top <topology_file> -trj <trajectory_file> -output <file_name> -threshold <threshold_interaction> -skip <OPTIONAL><how_many_frames_to_skip>
 """
 
 __author__ = "Ravy LEON FOUN LIN"
