@@ -19,7 +19,7 @@ And then :
 ## Usage.
 Once the environment is activated, here the command line to use **Glyco-MKII** :
 
-`./Glyco_MKII.py -top <topology_file> -trj <trajectory_file> -output <file_name> -threshold <threshold_interaction>`
+`./Glyco_MKII.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction>`
     
 ### Arguments.
   - **top** : Indicate the path to the topology file (PDB,GRO,CIF...).
