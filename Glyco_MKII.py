@@ -249,7 +249,7 @@ if __name__ == "__main__" :
     if SKIP != 0 :
         full_time = (u.trajectory.totaltime)+1/SKIP
     else :
-        full_time = (u.trajectory.totaltime)+1/SKIP
+        full_time = (u.trajectory.totaltime)+1
 
     #  Creation of new structure with new b_factors for each carbohydrates?
     for carb in full_dict.keys() :
