@@ -230,7 +230,7 @@ if __name__ == "__main__" :
 
     #  Compute contact of carbohydrates with threshold setted.
     print("Fullfill dictionnary...")
-    THR = int(THR)
+    THR = float(THR)
     full_dict = fullfill_dict(THR, dictionnary)
 
     #  Frames number.
