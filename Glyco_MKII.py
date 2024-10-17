@@ -44,6 +44,8 @@ else :
     THR = args.threshold
     if args.skip != 0 :
         SKIP = args.skip
+    else :
+        SKIP = 0
 
 def Universe(TOP : str,TRJ : str) :
     """Set Universe.
@@ -127,12 +129,13 @@ def fullfill_dict(THR : str, dict_carbs : dict, SKIP : int) :
     #  Iterate on trajectory.
     for ts in tqdm(u.trajectory) :
         
-        #  Will treat every SKIP frames.
-        if count % int(SKIP) != 0 :
-            count += 1
-            continue
-        else :
-            count += 1
+        if SKIP != 0 :
+            #  Will treat every SKIP frames.
+            if count % int(SKIP) != 0 :
+                count += 1
+                continue
+            else :
+                count += 1
 
         #  Iterate on protein atoms.
         for carbs in input_carbs_list :
