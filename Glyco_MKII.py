@@ -118,18 +118,36 @@ def fullfill_dict(THR : str, dict_carbs : dict) :
     #  Select C-alpha from protein.
     protein = u.select_atoms("name CA")
 
+    #  Iterate on trajectory.
     for ts in tqdm(u.trajectory) :
+        #  Iterate on protein atoms.
         for atom in protein :
+            #  Skip hydrogens.
+            if atom.type == 'H' :
+                continue
+            #  Iterate on the different carbohydrates.
             for carbs in input_carbs_list :
-                d = distance_array(carbs.positions,atom.position)[0][0]
-                if d <= THR :
-                    key = f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"
-                    if key not in dict_carbs[carbs.segids[0]].keys() :
-                        dict_carbs[carbs.segids[0]][key] = 1
+                #  Iterate on each carbohydrate. 
+                for atom_car in carbs.atoms :
+                    
+                    #  Skip hydrogens.
+                    if atom_car.type == 'H' :
+                        continue
+                    #  Compute distance between both atoms.
+                    d = distance_array(atom_car.position,atom.position)[0][0]
+                    
+                    #  If it fit in the threshold add to the count.
+                    if d <= THR :
+                        key = f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"
+                        if key not in dict_carbs[carbs.segids[0]].keys() :
+                            dict_carbs[carbs.segids[0]][key] = 1
+                        else :
+                            dict_carbs[carbs.segids[0]][key] += 1
+                        #  Then break the for loop, we do not need to count how many atoms of the carbohydrate is in contact. Just if at least one is in contact.
+                        break
+                    #  If the distance do not fit the threshold, go to next atom.
                     else :
-                        dict_carbs[carbs.segids[0]][key] += 1
-                else :
-                    continue
+                        continue
     
     #  Save as dataframe.
     df = pd.DataFrame.from_dict(dict_carbs, orient = 'index')
