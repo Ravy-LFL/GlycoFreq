@@ -50,4 +50,17 @@ Once loaded, to show color the protein depending on the frequency of interaction
 `spectrum b, blue_white_red, selection=polymer`
 
 
+## Example.
 
+You can try the using the files in the **examples** folder as follow :
+
+`./Glyco_MKII.py -top examples/topology_file.pdb -trj examples/trajectory_file.xtc-output . -threshold 8`
+
+And will produce this outputs :
+
+The PDB file colored by PyMol.
+![Alt text](img/example_glyco_mkII.png)
+
+
+And the CSV file.
+![Alt text](img/example_csv.png)
