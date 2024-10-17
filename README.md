@@ -43,3 +43,11 @@ The script produce a *csv* file with the how many frame the residue is in contac
 And it produced PDB file of the input protein, but with the b-factor replaced by the percentage of time that a residue was a contact with the carbohydrate.
 One PDB file is produce by carbohydrate.
 
+## Color with Pymol
+
+Once loaded, to show color the protein depending on the frequency of interaction, the following command line can be use in PyMol:
+
+`spectrum b, blue_white_red, selection=polymer`
+
+
+
