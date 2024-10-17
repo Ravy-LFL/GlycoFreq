@@ -28,6 +28,8 @@ parser.add_argument("-top",help="Path to topology file.")
 parser.add_argument("-trj",help="Path to trajectory file.")
 parser.add_argument("-output",help="Path to output file.")
 parser.add_argument("-threshold",help="Threshold of contact.")
+parser.add_argument("-skip", help="Set a number if you want to skip a certain number of frames in the simulation (default : 0). Will accelerate the computation.", default=0)
+
 
 
 args = parser.parse_args()
@@ -40,6 +42,8 @@ else :
     TRJ = args.trj
     OUT = args.output
     THR = args.threshold
+    if args.skip != 0 :
+        SKIP = args.skip
 
 def Universe(TOP : str,TRJ : str) :
     """Set Universe.
@@ -93,7 +97,7 @@ def create_dictionnary(u) :
     return dict_carbs
 
 
-def fullfill_dict(THR : str, dict_carbs : dict) :
+def fullfill_dict(THR : str, dict_carbs : dict, SKIP : int) :
     """Count contact of carbohydrate and fullfil dict.
 
         Parameters
@@ -102,6 +106,8 @@ def fullfill_dict(THR : str, dict_carbs : dict) :
                 Threshold to count contact.
             dict_carbs : dict
                 Dict of count.
+            SKIP : int
+                Number of frame to skip. (default value : 0)
             
         Returns
         -------
@@ -110,39 +116,42 @@ def fullfill_dict(THR : str, dict_carbs : dict) :
     """
 
     #  Create list of input for carbohydrates.
-    input_carbs_list = list()
-    for carbs in dict_carbs.keys() :
-        INPUT = u.select_atoms(f"segid {carbs}")
-        input_carbs_list.append(INPUT)
+    input_carbs_list = [u.select_atoms(f"segid {carbs} and not type H") for carbs in dict_carbs.keys()]
     
     #  Select C-alpha from protein.
     protein = u.select_atoms("name CA")
 
+    #  Count for skipping.
+    count = 0
+
     #  Iterate on trajectory.
     for ts in tqdm(u.trajectory) :
+        
+        #  Will treat every SKIP frames.
+        if count % int(SKIP) != 0 :
+            count += 1
+            continue
+        else :
+            count += 1
+
         #  Iterate on protein atoms.
-        for atom in protein :
-            #  Skip hydrogens.
-            if atom.type == 'H' :
-                continue
+        for carbs in input_carbs_list :
+
             #  Iterate on the different carbohydrates.
-            for carbs in input_carbs_list :
+            for atom_car in carbs.atoms :
                 #  Iterate on each carbohydrate. 
-                for atom_car in carbs.atoms :
+                for atom in protein.atoms :
                     
-                    #  Skip hydrogens.
-                    if atom_car.type == 'H' :
-                        continue
                     #  Compute distance between both atoms.
                     d = distance_array(atom_car.position,atom.position)[0][0]
                     
                     #  If it fit in the threshold add to the count.
                     if d <= THR :
-                        key = f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"
-                        if key not in dict_carbs[carbs.segids[0]].keys() :
-                            dict_carbs[carbs.segids[0]][key] = 1
+
+                        if f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}" not in dict_carbs[carbs.segids[0]].keys() :
+                            dict_carbs[carbs.segids[0]][f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"] = 1
                         else :
-                            dict_carbs[carbs.segids[0]][key] += 1
+                            dict_carbs[carbs.segids[0]][f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"] += 1
                         #  Then break the for loop, we do not need to count how many atoms of the carbohydrate is in contact. Just if at least one is in contact.
                         break
                     #  If the distance do not fit the threshold, go to next atom.
@@ -231,7 +240,7 @@ if __name__ == "__main__" :
     #  Compute contact of carbohydrates with threshold setted.
     print("Fullfill dictionnary...")
     THR = float(THR)
-    full_dict = fullfill_dict(THR, dictionnary)
+    full_dict = fullfill_dict(THR, dictionnary,SKIP)
 
     #  Frames number.
     full_time = (u.trajectory.totaltime)+1
