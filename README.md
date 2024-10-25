@@ -26,7 +26,7 @@ Once the environment is activated, here the command line to use **Glyco-MKII** :
 
   - **trj** : Indicate the path to the trajectory file (XTC,DCD,TRR...).
 
-  - **output** : Indicate the path to the output files. The output files are a csv named **out_count_carbohydrates.csv**, a second csv named **infos_carbo_residue.csv**, and as much PDB files as number of carbohydrates named **contact_with_<segid_of_carbohydrate>.pdb**
+  - **output** : Indicate the path to the output files. The output files are a csv named **out_count_carbohydrates.csv**, a second csv named **infos_carbo_residue.csv**, as much PDB files as number of carbohydrates named **contact_with_<segid_of_carbohydrate>.pdb**. And finally, **glyco.log**, a file log with informations about the job.
 
   - **threshold** : Indicate the threshold to count a distance as a contact between a heavy atoms of the carbohydrates and the residues.
 
@@ -47,8 +47,10 @@ One with how many time the residue is in contact with the carbohydrate.
 
 And another with the more precise informations about the carbohydrate in interaction with the the residue. Columns of this file => **residue**,**segid**,**carbohydrate**,**carbohydrate_number**,**group**,**frame**.
 
-And it produced PDB file of the input protein, but with the b-factor replaced by the percentage of time that a residue was a contact with the carbohydrate.
+It produced PDB file of the input protein, but with the b-factor replaced by the percentage of time that a residue was a contact with the carbohydrate.
 One PDB file is produce by carbohydrate.
+
+And a **log** file.
 
 ## Color with Pymol
 
@@ -71,6 +73,8 @@ And will produce these outputs :
 - **out_count_carbohydrates.csv** : The CSV file which contains the informations of how many time a residue is in contact with the carbohydrate.
 
 - **infos_carbos_residue.csv** : The CSV file which contains the informations about the carbohydrates.
+
+- **glyco.log** : The log file.
 
 These outputs are also in the `examples/results/`.
 
