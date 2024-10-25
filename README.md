@@ -81,6 +81,12 @@ The grey molecule here is the carbohydrate.
 ![Alt text](img/example_glyco_mkII.png)
 
 
-And the CSV file.
+And the CSV files.
 
+
+**Count file.**
 ![Alt text](img/example_csv.png)
+
+
+**Infos file.**
+![Alt text](img/example_csv_infos.png)
