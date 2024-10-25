@@ -140,25 +140,25 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
         for carbs in input_carbs_list :
 
             #  Iterate on the different carbohydrates.
-            for atom_car in carbs.atoms :
+            for atom_prot in protein.atoms :
                 #  Iterate on each carbohydrate.
-                ID_atom_prot = 1
+                ID_atom_carb = 0
                 while d > THR :                    
                     #  Compute distance between both atoms.
-                    d = distance_array(atom_car.position,protein[ID_atom_prot-1].position)[0][0]
-                    ID_atom_prot += 1
-                    if ID_atom_prot == 1325 :
+                    d = distance_array(atom_prot.position,carbs[ID_atom_carb].position)[0][0]
+                    ID_atom_carb += 1
+                    if ID_atom_carb == len(carbs.atoms) :
                         break
                 
                  
-                if ID_atom_prot != 1325 :
-                    #  If it fit in the threshold add to the count.
-                    atom = protein[ID_atom_prot-1]
-                    if f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}" not in dict_carbs[carbs.segids[0]].keys() :
-                        dict_carbs[carbs.segids[0]][f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"] = 1
-                    else :
-                        dict_carbs[carbs.segids[0]][f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"] += 1
-                        #  Then break the for loop, we do not need to count how many atoms of the carbohydrate is in contact. Just if at least one is in contact.
+                if ID_atom_carb != len(carbs.atoms) :
+                    if d < THR : 
+                        #  If it fit in the threshold add to the count.
+                        if f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}" not in dict_carbs[carbs.segids[0]].keys() :
+                            dict_carbs[carbs.segids[0]][f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"] = 1
+                        else :
+                            dict_carbs[carbs.segids[0]][f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"] += 1
+                #  Then break the for loop, we do not need to count how many atoms of the carbohydrate is in contact. Just if at least one is in contact.
                 d = THR +1
     
     #  Save as dataframe.
@@ -247,6 +247,11 @@ if __name__ == "__main__" :
 
     #  Frames number.
     full_time = (u.trajectory.totaltime)+1
+
+    #  If SKIP if set, the number of frames counted have to be adapt. Since some were skipped.
+    if SKIP !=0 or SKIP != None :
+        div = full_time/SKIP
+        full_time = full_time/div
 
     #  Creation of new structure with new b_factors for each carbohydrates?
     for carb in full_dict.keys() :
