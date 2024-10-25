@@ -70,7 +70,7 @@ And will produce these outputs :
 
 - **out_count_carbohydrates.csv** : The CSV file which contains the informations of how many time a residue is in contact with the carbohydrate.
 
-- **infos_carbosçresidue.csv** : The CSV file which contains the informations about the carbohydrates.
+- **infos_carbos_residue.csv** : The CSV file which contains the informations about the carbohydrates.
 
 These outputs are also in the `examples/results/`.
 
