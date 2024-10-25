@@ -176,6 +176,8 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int, OUT : str) :
     df.to_csv(f"{OUT}/out_count_carbohydrates.csv")
     out_infos.close()
 
+    return dict_carbs
+
 def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : str, OUT : str) :
     """New function to set new b-factors values.
 
@@ -225,7 +227,6 @@ def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : s
                     
                     if new_bfs > 1.00 :
                         new_bfs = 1.00
-                    print(new_bfs)
                 else :
                     new_bfs = -1.00
                 for atom in residue :
@@ -269,7 +270,7 @@ def write_log(OUT : str, TOP : str,TRJ :str, THR : int, SKIP : int, full_dict : 
         THRESHOLD OF CONTACT : {THR} Angstrom
         NUMBER OF FRAME TO SKIP : {SKIP}
         NUMBER OF CARBOHYDATES : {len(full_dict.keys())}
-        {[i for i in full_dict.keys()]}
+        {[i for i in list(full_dict.keys())]}
         """
     with open(f"{OUT}/glyco.log", "w") as f :
         f.write(log)
@@ -288,14 +289,14 @@ if __name__ == "__main__" :
     #  Compute contact of carbohydrates with threshold setted.
     print("Fullfill dictionnary...")
     THR = int(THR)
-    full_dict = fullfill_dict_3(THR, dictionnary,SKIP)
+    full_dict = fullfill_dict_3(THR, dictionnary,SKIP,OUT)
 
     #  Frames number.
     full_time = (u.trajectory.totaltime)+1
 
     #  If SKIP if set, the number of frames counted have to be adapt. Since some were skipped.
     if SKIP !=0 or SKIP != None :
-        div = full_time/SKIP
+        div = full_time/int(SKIP)
         full_time = full_time/div
 
     #  Creation of new structure with new b_factors for each carbohydrates?
