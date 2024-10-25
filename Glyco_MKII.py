@@ -132,12 +132,14 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
     for ts in tqdm(u.trajectory) :
         
         #  Will treat every SKIP frames.
-        if SKIP != 0 :
+        if SKIP != 0:
             if count % int(SKIP) != 0 :
                 count += 1
                 continue
             else :
                 count += 1
+        else :
+            count += 1
 
         #  Iterate on protein atoms.
         for carbs in input_carbs_list :
