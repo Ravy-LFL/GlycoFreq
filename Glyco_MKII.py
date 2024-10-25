@@ -238,7 +238,44 @@ def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : s
 
     return 0              
 
+def write_log(OUT : str, TOP : str,TRJ :str, THR : int, SKIP : int, full_dict : dict) :
+    """Write and print log file.
+        
+        Parameters
+        ----------
+            OUT : str
+                Path to output files.
+            TOP : str
+                Path to topology file.
+            TRJ : str
+                Path to trajectory file.
+            THR : int
+                Threshold.
+            SKIP : int
+                Number of frame to skip.
+            full_dict : dict
+                Dict of count
+        
+        Returns
+        -------
+            str
+            Write a file.
+    """
 
+    log = f"""
+        OUTPUT PATH : {OUT}
+        TOPOLOGY FILE PATH : {TOP}
+        TRAJECTORY FILE PATH : {TRJ}
+        THRESHOLD OF CONTACT : {THR} Angstrom
+        NUMBER OF FRAME TO SKIP : {SKIP}
+        NUMBER OF CARBOHYDATES : {len(full_dict.keys())}
+        {[i for i in full_dict.keys()]}
+        """
+    with open(f"{OUT}/glyco.log", "w") as f :
+        f.write(log)
+    print(log)
+
+    return 0
 if __name__ == "__main__" :
     #  Load universe object...
     print("Load Universe...")
@@ -265,3 +302,6 @@ if __name__ == "__main__" :
     for carb in full_dict.keys() :
         print(f"Treating {carb}...")
         set_new_b_factor(TOP, full_dict, full_time, carb, OUT)
+
+    #  Write log file.
+    write_log(OUT, TOP, TRJ, THR, SKIP, full_dict)
