@@ -41,7 +41,11 @@ Once the environment is activated, here the command line to use **Glyco-MKII** :
 
 ## Outputs.
 
-The script produce a *csv* file with the how many frame the residue is in contact with the carbohydrate.
+The script produce two *csv* files. 
+
+One with how many time the residue is in contact with the carbohydrate. 
+
+And another with the more precise informations about the carbohydrate in interaction with the the residue. Columns of this file => **residue**,**segid**,**carbohydrate**,**carbohydrate_number**,**group**,**frame**.
 
 And it produced PDB file of the input protein, but with the b-factor replaced by the percentage of time that a residue was a contact with the carbohydrate.
 One PDB file is produce by carbohydrate.
@@ -65,6 +69,8 @@ And will produce these outputs :
 - **contact_with_CARA.pdb** : The PDB file with the proportion of interaction as b-factor.
 
 - **out_count_carbohydrates.csv** : The CSV file which contains the informations of how many time a residue is in contact with the carbohydrate.
+
+- **infos_carbosçresidue.csv** : The CSV file which contains the informations about the carbohydrates.
 
 These outputs are also in the `examples/results/`.
 
