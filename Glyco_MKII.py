@@ -122,6 +122,9 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
     #  Count for skipping.
     count = 0
 
+    #  CSV file with contact infos from the carbohydrate.
+    out_infos = open("infos_carbos_residue.csv", "w")
+    out_infos.write("residue,segid,carbohydrate,carbohydrate_number,group,frame\n")
     #  Distance compared to the threshold.
     d = THR + 1
 
@@ -152,7 +155,8 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
                 
                  
                 if ID_atom_carb != len(carbs.atoms) :
-                    if d < THR : 
+                    if d < THR :
+                        out_infos.write(f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid},{carbs[ID_atom_carb].segid},{carbs[ID_atom_carb].resname},{carbs[ID_atom_carb].resid},{carbs[ID_atom_carb].type},{count+1}\n") 
                         #  If it fit in the threshold add to the count.
                         if f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}" not in dict_carbs[carbs.segids[0]].keys() :
                             dict_carbs[carbs.segids[0]][f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"] = 1
@@ -164,9 +168,7 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
     #  Save as dataframe.
     df = pd.DataFrame.from_dict(dict_carbs, orient = 'index')
     df.to_csv("out_count_carbohydrates.csv")
-
-    return dict_carbs
-
+    out_infos.close()
 
 def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : str, OUT : str) :
     """New function to set new b-factors values.
