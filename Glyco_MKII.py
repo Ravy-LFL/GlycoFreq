@@ -95,7 +95,7 @@ def create_dictionnary(u) :
     return dict_carbs
 
 
-def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
+def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int, OUT : str) :
     """Count contact of carbohydrate and fullfil dict.
 
         Parameters
@@ -106,11 +106,15 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
                 Dict of count.
             SKIP : int
                 Number of frame to skip. (default value : 0)
+            OUT : str
+                Path to outputs.
             
         Returns
         -------
             Dict
             Fullfill dictionnary.
+            Str
+            Write files.
     """
 
     #  Create list of input for carbohydrates.
@@ -123,7 +127,7 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
     count = 0
 
     #  CSV file with contact infos from the carbohydrate.
-    out_infos = open("infos_carbos_residue.csv", "w")
+    out_infos = open(f"{OUT}/infos_carbos_residue.csv", "w")
     out_infos.write("residue,segid,carbohydrate,carbohydrate_number,group,frame\n")
     #  Distance compared to the threshold.
     d = THR + 1
@@ -169,7 +173,7 @@ def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
     
     #  Save as dataframe.
     df = pd.DataFrame.from_dict(dict_carbs, orient = 'index')
-    df.to_csv("out_count_carbohydrates.csv")
+    df.to_csv(f"{OUT}/out_count_carbohydrates.csv")
     out_infos.close()
 
 def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : str, OUT : str) :
