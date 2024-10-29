@@ -84,7 +84,6 @@ The grey molecule here is the carbohydrate.
 
 <p align="center">
 <img src="img/example_structure.gif">
-![Alt text](img/example_structure.gif)
 </p>
 
 And the CSV files.
@@ -93,11 +92,11 @@ And the CSV files.
 **Count file.**
 
 <p align="center">
-![Alt text](img/example_csv.png)
+<img src="img/example_csv.png">
 </p>
 
 **Infos file.**
 
 <p align="center">
-![Alt text](img/example_csv_infos.png)
+<img src="img/example_csv_infos.png">
 </p>
