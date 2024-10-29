@@ -296,8 +296,7 @@ if __name__ == "__main__" :
 
     #  If SKIP if set, the number of frames counted have to be adapt. Since some were skipped.
     if SKIP !=0 or SKIP != None :
-        div = full_time/int(SKIP)
-        full_time = full_time/div
+        full_time = full_time/int(SKIP)
 
     #  Creation of new structure with new b_factors for each carbohydrates?
     for carb in full_dict.keys() :
