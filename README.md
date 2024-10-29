@@ -82,17 +82,21 @@ The PDB file colored by PyMol. It was colored, using the command line shown earl
 Blue demonstrate a no interactions at all, and going through white to red, demonstrate greater count of contact.
 The grey molecule here is the carbohydrate.
 
+<p align="center">
 ![Alt text](img/example_structure.gif)
-
+</p>
 
 And the CSV files.
 
 
 **Count file.**
 
+<p align="center">
 ![Alt text](img/example_csv.png)
-
+</p>
 
 **Infos file.**
 
+<p align="center">
 ![Alt text](img/example_csv_infos.png)
+</p>
