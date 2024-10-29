@@ -83,6 +83,7 @@ Blue demonstrate a no interactions at all, and going through white to red, demon
 The grey molecule here is the carbohydrate.
 
 <p align="center">
+<img src="img/example_structure.gif">
 ![Alt text](img/example_structure.gif)
 </p>
 
