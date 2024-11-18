@@ -96,129 +96,6 @@ def create_dictionnary(u) :
     return dict_carbs
 
 
-def fullfill_dict(THR : str, dict_carbs : dict) :
-    """Count contact of carbohydrate and fullfil dict.
-
-        Parameters
-        -----------
-            THR : str
-                Threshold to count contact.
-            dict_carbs : dict
-                Dict of count.
-            
-        Returns
-        -------
-            Dict
-            Fullfill dictionnary.
-    """
-
-    #  Create list of input for carbohydrates.
-    input_carbs_list = [u.select_atoms(f"segid {carbs} and not type H") for carbs in dict_carbs.keys()]
-
-    #  Select C-alpha from protein.
-    protein = u.select_atoms("name CA")
-
-    #  Iterate on trajectory.
-    for ts in tqdm(u.trajectory) :
-        #  Iterate on protein atoms.
-        for atom in protein :
-
-            #  Iterate on the different carbohydrates.
-            for carbs in input_carbs_list :
-                #  Iterate on each carbohydrate. 
-                for atom_car in carbs.atoms :
-                    
-                    #  Compute distance between both atoms.
-                    d = distance_array(atom_car.position,atom.position)[0][0]
-                    
-                    #  If it fit in the threshold add to the count.
-                    if d <= THR :
-
-                        if f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}" not in dict_carbs[carbs.segids[0]].keys() :
-                            dict_carbs[carbs.segids[0]][f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"] = 1
-                        else :
-                            dict_carbs[carbs.segids[0]][f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"] += 1
-                        #  Then break the for loop, we do not need to count how many atoms of the carbohydrate is in contact. Just if at least one is in contact.
-                        break
-                    #  If the distance do not fit the threshold, go to next atom.
-                    else :
-                        continue
-    
-    #  Save as dataframe.
-    df = pd.DataFrame.from_dict(dict_carbs, orient = 'index')
-    df.to_csv("out_count_carbohydrates.csv")
-
-    return dict_carbs
-
-def fullfill_dict_2(THR : str, dict_carbs : dict, SKIP : int) :
-    """Count contact of carbohydrate and fullfil dict.
-
-        Parameters
-        -----------
-            THR : str
-                Threshold to count contact.
-            dict_carbs : dict
-                Dict of count.
-            SKIP : int
-                Number of frame to skip. (default value : 0)
-            
-        Returns
-        -------
-            Dict
-            Fullfill dictionnary.
-    """
-
-    #  Create list of input for carbohydrates.
-    input_carbs_list = [u.select_atoms(f"segid {carbs} and not type H") for carbs in dict_carbs.keys()]
-    
-    #  Select C-alpha from protein.
-    protein = u.select_atoms("name CA")
-
-    #  Count for skipping.
-    count = 0
-
-    #  Iterate on trajectory.
-    for ts in tqdm(u.trajectory) :
-        
-        #  Will treat every SKIP frames.
-        if SKIP != 0 :
-            if count % int(SKIP) != 0 :
-                count += 1
-                continue
-            else :
-                count += 1
-
-        #  Iterate on protein atoms.
-        for carbs in input_carbs_list :
-
-            #  Iterate on the different carbohydrates.
-            for atom_car in carbs.atoms :
-                #  Iterate on each carbohydrate. 
-                for atom in protein.atoms :
-                    
-                    #  Compute distance between both atoms.
-                    d = distance_array(atom_car.position,atom.position)[0][0]
-                    
-                    #  If it fit in the threshold add to the count.
-                    if d <= THR :
-
-                        if f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}" not in dict_carbs[carbs.segids[0]].keys() :
-                            dict_carbs[carbs.segids[0]][f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"] = 1
-                        else :
-                            dict_carbs[carbs.segids[0]][f"{atom.residue.resname}_{atom.residue.resid}_{atom.segid}"] += 1
-                        #  Then break the for loop, we do not need to count how many atoms of the carbohydrate is in contact. Just if at least one is in contact.
-                        break
-                    #  If the distance do not fit the threshold, go to next atom.
-                    else :
-                        continue
-    
-    #  Save as dataframe.
-    df = pd.DataFrame.from_dict(dict_carbs, orient = 'index')
-    df.to_csv("out_count_carbohydrates.csv")
-
-    return dict_carbs
-
-
 def treat_fullfill_dict(protein,THR,carbs,out_infos,dict_carbs,d,count) :
 #  Iterate on the different carbohydrates.
     for atom_prot in protein.atoms :
@@ -246,7 +123,7 @@ def treat_fullfill_dict(protein,THR,carbs,out_infos,dict_carbs,d,count) :
         d = THR +1
     return dict_carbs
 
-def fullfill_dict_3(THR : str, dict_carbs : dict, SKIP : int) :
+def fullfill_dict(THR : str, dict_carbs : dict, SKIP : int) :
     """Count contact of carbohydrate and fullfil dict.
 
         Parameters
@@ -377,7 +254,7 @@ if __name__ == "__main__" :
     #  Compute contact of carbohydrates with threshold setted.
     print("Fullfill dictionnary...")
     THR = int(THR)
-    full_dict = fullfill_dict_3(THR, dictionnary,SKIP)
+    full_dict = fullfill_dict(THR, dictionnary,SKIP)
 
     #  Frames number.
     full_time = (u.trajectory.totaltime)+1
