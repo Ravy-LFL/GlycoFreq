@@ -96,92 +96,93 @@ def create_dictionnary(u) :
     return dict_carbs
 
 
-def treat_fullfill_dict(protein,THR,carbs,out_infos,dict_carbs,d,count) :
-#  Iterate on the different carbohydrates.
-    for atom_prot in protein.atoms :
-        #  Iterate on each carbohydrate.
-        ID_atom_carb = 0
-        while d > THR :                    
-            #  Compute distance between both atoms.
-            d = distance_array(atom_prot.position,carbs[ID_atom_carb].position)[0][0]
-            ID_atom_carb += 1
-            if ID_atom_carb == len(carbs.atoms) :
-                break
-        
-        #  Check if atom is part of the list.            
-        if ID_atom_carb != len(carbs.atoms) :
-            #  Check if it under the set threshold.
-            if d < THR :
-                #  Write the informations file.
-                out_infos.write(f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid},{carbs[ID_atom_carb].segid},{carbs[ID_atom_carb].resname},{carbs[ID_atom_carb].resid},{carbs[ID_atom_carb].type},{count+1}\n") 
-                #  If it fit in the threshold add to the count.
-                if f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}" not in dict_carbs[carbs.segids[0]].keys() :
-                    dict_carbs[carbs.segids[0]][f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"] = 1
-                else :
-                    dict_carbs[carbs.segids[0]][f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"] += 1
-        #  Then break the for loop, we do not need to count how many atoms of the carbohydrate is in contact. Just if at least one is in contact.
-        d = THR +1
-    return dict_carbs
 
-def fullfill_dict(THR : str, dict_carbs : dict, SKIP : int) :
-    """Count contact of carbohydrate and fullfil dict.
-
-        Parameters
-        -----------
-            THR : str
-                Threshold to count contact.
-            dict_carbs : dict
-                Dict of count.
-            SKIP : int
-                Number of frame to skip. (default value : 0)
-            
-        Returns
-        -------
-            Dict
-            Fullfill dictionnary.
+def treat_fullfill_dict(protein, THR, carbs, out_infos_buffer, dict_carbs, count):
     """
+    Process a single carbohydrate to compute contacts with the protein and update the dictionary.
+    """
+    carb_positions = np.array([atom.position for atom in carbs.atoms])
+    protein_positions = np.array([atom.position for atom in protein.atoms])
 
-    #  Create list of input for carbohydrates.
+    # Compute all pairwise distances between protein and carbohydrate atoms.
+    distances = distance_array(protein_positions, carb_positions)
+
+    # Iterate through protein atoms and check for close carbohydrate atoms.
+    for i, atom_prot in enumerate(protein.atoms):
+        close_carb_indices = np.where(distances[i] < THR)[0]
+        if close_carb_indices.size > 0:
+            carb_atom = carbs.atoms[close_carb_indices[0]]  # First close carbohydrate atom.
+            
+            # Write contact info to buffer.
+            prot_id = f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"
+            carb_info = (f"{prot_id},{carb_atom.segid},{carb_atom.resname},"
+                         f"{carb_atom.resid},{carb_atom.type},{count + 1}\n")
+            out_infos_buffer.append(carb_info)
+
+            # Update dictionary.
+            dict_carbs[carbs.segids[0]].setdefault(prot_id, 0)
+            dict_carbs[carbs.segids[0]][prot_id] += 1
+
+def fullfill_dict(THR: float, dict_carbs: dict, SKIP: int):
+    """
+    Count contacts between carbohydrates and the protein and fulfill the dictionary.
+
+    Parameters:
+    -----------
+    THR : float
+        Threshold distance to consider a contact.
+    dict_carbs : dict
+        Dictionary to store contact counts.
+    SKIP : int
+        Number of frames to skip during processing.
+
+    Returns:
+    --------
+    dict
+        Updated dictionary with contact counts.
+    """
+    # Select carbohydrate atoms (excluding hydrogens).
     input_carbs_list = [u.select_atoms(f"segid {carbs} and not type H") for carbs in dict_carbs.keys()]
     
-    #  Select C-alpha from protein.
+    # Select C-alpha atoms from the protein.
     protein = u.select_atoms("name CA")
 
-    #  Count for skipping.
+    # Initialize counter for frames and output buffer.
     count = 0
+    out_infos_buffer = []
 
-    #  CSV file with contact infos from the carbohydrate.
-    out_infos = open("infos_carbos_residue.csv", "w")
-    out_infos.write("residue,segid,carbohydrate,carbohydrate_number,group,frame\n")
-    #  Distance compared to the threshold.
-    d = THR + 1
+    # Open CSV output file.
+    with open("infos_carbos_residue.csv", "w") as out_infos:
+        out_infos.write("residue,segid,carbohydrate,carbohydrate_number,group,frame\n")
 
-    #  Iterate on trajectory.
-    for ts in tqdm(u.trajectory) :
-        
-        #  Will treat every SKIP frames.
-        if SKIP != 0 :
-            if count % int(SKIP) != 0 :
+        # Iterate through trajectory frames.
+        for ts in tqdm(u.trajectory):
+            if SKIP != 0 and count % SKIP != 0:
                 count += 1
                 continue
-            else :
-                count += 1
-        else :
+
             count += 1
-        #  Iterate on protein atoms.
-        #  Create a thread for each carbohydrate.
-        print(count)
-        for carbs in input_carbs_list :
-            t = threading.Thread(target=treat_fullfill_dict, args=(protein,THR,carbs,out_infos,dict_carbs,d,count))
-            t.start()
-            t.join()
-    print(dict_carbs)
-    #  Save as dataframe.
-    df = pd.DataFrame.from_dict(dict_carbs, orient = 'index')
+            threads = []
+            for carbs in input_carbs_list:
+                # Use threading for each carbohydrate set.
+                thread = threading.Thread(target=treat_fullfill_dict, args=(protein, THR, carbs, out_infos_buffer, dict_carbs, count))
+                threads.append(thread)
+                thread.start()
+
+            # Wait for all threads to finish.
+            for thread in threads:
+                thread.join()
+
+            # Write accumulated results to the file.
+            out_infos.writelines(out_infos_buffer)
+            out_infos_buffer.clear()
+
+    # Save the contact count dictionary to a CSV file.
+    df = pd.DataFrame.from_dict(dict_carbs, orient="index")
     df.to_csv("out_count_carbohydrates.csv")
-    out_infos.close()
 
     return dict_carbs
+
 
 def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : str, OUT : str) :
     """New function to set new b-factors values.
@@ -256,7 +257,7 @@ if __name__ == "__main__" :
 
     #  Compute contact of carbohydrates with threshold setted.
     print("Fullfill dictionnary...")
-    THR = int(THR)
+    THR = float(THR)
     full_dict = fullfill_dict(THR, dictionnary,SKIP)
 
     #  Frames number.
