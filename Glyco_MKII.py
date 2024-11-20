@@ -40,7 +40,7 @@ else :
     OUT = args.output
     THR = args.threshold
     if args.skip != None :
-        SKIP = args.skip
+        SKIP = int(args.skip)
     else :
         SKIP = 0
 
@@ -166,8 +166,11 @@ def fullfill_dict(THR : str, dict_carbs : dict, SKIP : int) :
                 continue
             else :
                 count += 1
+        else :
+            count += 1
         #  Iterate on protein atoms.
         #  Create a thread for each carbohydrate.
+        print(count)
         for carbs in input_carbs_list :
             t = threading.Thread(target=treat_fullfill_dict, args=(protein,THR,carbs,out_infos,dict_carbs,d,count))
             t.start()
@@ -257,7 +260,11 @@ if __name__ == "__main__" :
     full_dict = fullfill_dict(THR, dictionnary,SKIP)
 
     #  Frames number.
-    full_time = (u.trajectory.totaltime)+1
+    if SKIP != 0 :
+        full_time = (u.trajectory.totaltime)+1
+        full_time = int(full_time/SKIP) + 1
+    else :
+        full_time = (u.trajectory.totaltime)+1
 
     #  Creation of new structure with new b_factors for each carbohydrates?
     for carb in full_dict.keys() :
