@@ -31,7 +31,7 @@ Once the environment is activated, here the command line to use **Glyco-MKII** :
 `./Glyco_MKII.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction> -skip (OPTIONAL) <how_many_frames_to_skip>`
     
 ### Arguments.
-  - **top** : Indicate the path to the topology file (PDB,GRO,CIF...).
+  - **top** : Indicate the path to the topology file (PDB)
 
   - **trj** : Indicate the path to the trajectory file (XTC,DCD,TRR...).
 
