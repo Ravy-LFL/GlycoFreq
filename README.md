@@ -17,6 +17,15 @@ And then :
 `<conda/micromamba> activate Glyco-MKII`
 
 ## Usage.
+
+### CHARMM-GUI.
+First of all, you have to treat your topology file with the tool **PDB Reader & Manipulator**.
+This will give you a file named `step1_pdbreader.pdb`.
+This step is needed in order to 'mark' each carbohydrates with a SEGID, that is used by the script to retrieve the carbohydrates.
+If you made your system with **CHARMM-GUI** before, you should already have this file from the .zip they provided. You can also use the file named `step3_input.pdb`, which contains also the water and ions.
+
+### Environment.
+
 Once the environment is activated, here the command line to use **Glyco-MKII** :
 
 `./Glyco_MKII.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction> -skip (OPTIONAL) <how_many_frames_to_skip>`
@@ -41,14 +50,14 @@ Once the environment is activated, here the command line to use **Glyco-MKII** :
 
 ## Outputs.
 
-The script produce two *csv* files. 
+The script produce one *csv* file. 
 
-One with how many time the residue is in contact with the carbohydrate. 
-
-And another with the more precise informations about the carbohydrate in interaction with the the residue. Columns of this file => **residue**,**segid**,**carbohydrate**,**carbohydrate_number**,**group**,**frame**.
+It contains precise informations about the carbohydrate in interaction with the the residue. Columns of this file => **residue**,**segid**,**carbohydrate**,**carbohydrate_number**,**group**,**frame**.
 
 It produced PDB file of the input protein, but with the b-factor replaced by the percentage of time that a residue was a contact with the carbohydrate.
 One PDB file is produce by carbohydrate.
+
+And finally a PDB file of the protein called `global_interaction_frequencies.pdb` is made. This PDB file have the global interactions made by the whole carbohydrates, in the B-factor columns.
 
 And a **log** file.
 
@@ -86,14 +95,7 @@ The grey molecule here is the carbohydrate.
 <img src="img/example_structure.gif">
 </p>
 
-And the CSV files.
-
-
-**Count file.**
-
-<p align="center">
-<img src="img/example_csv.png">
-</p>
+And the CSV.
 
 **Infos file.**
 
