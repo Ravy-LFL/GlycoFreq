@@ -20,6 +20,8 @@ from MDAnalysis.analysis.distances import distance_array
 from Bio.PDB import PDBParser, PDBIO
 import pickle as pkl
 import threading
+import warnings
+warnings.filterwarnings('ignore')
 
 parser = argparse.ArgumentParser(prog = 'Glyco if it was actually smart coded', description = 'Compute frequence of interaction by carbohydrate on protein, and set it in new PDB structure as b-factor values.')
 parser.add_argument("-top",help="Path to topology file.")
@@ -243,7 +245,57 @@ def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : s
     io.set_structure(structure)
     io.save(output_pdb)
 
-    return 0              
+    return 0
+
+def compute_global_interaction_frequency(interaction_dict, sim_length):
+    """
+    Compute the global interaction frequency (normalized) for each residue.
+    
+    Chaque site de glycosylation (par exemple Asn) doit avoir la même valeur de contact, 
+    donc nous calculons la fréquence d'interaction uniquement pour chaque site en fonction 
+    de ses propres interactions.
+    """
+    global_frequency = {}  # Initialisation du dictionnaire pour stocker la fréquence globale
+
+    # Itération sur chaque glycan (segment de sucre) et ses interactions
+    for carb_data in interaction_dict.values():
+        for residue, count in carb_data.items():
+            # Normalisation de la fréquence d'interaction pour chaque site de glycosylation
+            # La fréquence est calculée en fonction du nombre d'interactions et de la longueur de la simulation
+            global_frequency[residue] = global_frequency.get(residue, 0) + count
+
+    # Normalisation de la fréquence (la fréquence doit être entre -1 et 1)
+    for residue in global_frequency:
+        # On divise par le nombre total de frames de la simulation pour obtenir une fréquence par frame
+        global_frequency[residue] = round(global_frequency[residue] / sim_length, 2)
+    
+    return global_frequency  # Retourne le dictionnaire des fréquences d'interaction globales
+
+
+
+def set_global_b_factors(topology, global_data, output_dir):
+    """
+    Met à jour les b-factors dans le fichier PDB en utilisant les fréquences d'interaction globales.
+    """
+    output_pdb = f"{output_dir}/global_interaction_frequencies.pdb"  # Définir le nom du fichier de sortie
+    parser = PDBParser(QUIET=True)  # Initialiser le parseur PDB
+    structure = parser.get_structure("protein", topology)  # Parser la structure PDB
+
+    # Itération sur chaque modèle, chaîne, et résidu dans la structure
+    for model in structure:
+        for chain in model:
+            for residue in chain:
+                # Créer un identifiant unique pour chaque résidu (nom, id, et segid)
+                res_id = f"{residue.resname}_{residue.get_id()[1]}_{residue.segid}"
+                # Récupérer la fréquence d'interaction pour ce résidu, sinon utiliser -1.00 par défaut
+                b_factor = global_data.get(res_id, -1.00)  # Si aucune donnée, b-factor par défaut
+                # Appliquer la fréquence d'interaction en tant que b-factor pour chaque atome du résidu
+                for atom in residue:
+                    atom.set_bfactor(b_factor)
+
+    io = PDBIO()  # Initialiser l'objet PDB pour l'écriture
+    io.set_structure(structure)  # Définir la structure à sauvegarder
+    io.save(output_pdb)  # Sauvegarder la structure mise à jour dans un fichier PDB
 
 
 if __name__ == "__main__" :
@@ -260,6 +312,9 @@ if __name__ == "__main__" :
     THR = float(THR)
     full_dict = fullfill_dict(THR, dictionnary,SKIP)
 
+    with open('dict_data_julien.pkl', 'wb') as f :
+        pkl.dump(full_dict,f)
+
     #  Frames number.
     if SKIP != 0 :
         full_time = (u.trajectory.totaltime)+1
@@ -267,11 +322,24 @@ if __name__ == "__main__" :
     else :
         full_time = (u.trajectory.totaltime)+1
 
-    #  Creation of new structure with new b_factors for each carbohydrates?
+     # Compute global interaction frequency
+    print("Computing global interaction frequency...")
+    global_interaction_frequency = compute_global_interaction_frequency(full_dict, full_time)
+
+    # Update PDB file with global frequencies as b-factors
+    print("Updating PDB file with global interaction frequencies...")
+    set_global_b_factors(args.top, global_interaction_frequency, args.output)
+
+
+    #  Creation of new structure with new b_factors for each carbohydrates.
+    threads = []
     for carb in full_dict.keys() :
         print(f"Treating {carb}...")
         
         #  Create a thread for each carbohydrate to create new structure.
         t = threading.Thread(target=set_new_b_factor,args=(TOP, full_dict, full_time, carb, OUT))
         t.start()
+        threads.append(t)
+    
+    for t in threads :
         t.join()
