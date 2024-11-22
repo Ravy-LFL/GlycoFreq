@@ -251,51 +251,51 @@ def compute_global_interaction_frequency(interaction_dict, sim_length):
     """
     Compute the global interaction frequency (normalized) for each residue.
     
-    Chaque site de glycosylation (par exemple Asn) doit avoir la même valeur de contact, 
-    donc nous calculons la fréquence d'interaction uniquement pour chaque site en fonction 
-    de ses propres interactions.
+    Each glycosylation site (e.g., Asn) should have the same contact value, 
+    so we calculate the interaction frequency only for each site based on 
+    its own interactions.
     """
-    global_frequency = {}  # Initialisation du dictionnaire pour stocker la fréquence globale
+    global_frequency = {}  # Initialize the dictionary to store global frequency
 
-    # Itération sur chaque glycan (segment de sucre) et ses interactions
+    # Iterate over each glycan (sugar segment) and its interactions
     for carb_data in interaction_dict.values():
         for residue, count in carb_data.items():
-            # Normalisation de la fréquence d'interaction pour chaque site de glycosylation
-            # La fréquence est calculée en fonction du nombre d'interactions et de la longueur de la simulation
+            # Normalize the interaction frequency for each glycosylation site
+            # The frequency is calculated based on the number of interactions and the simulation length
             global_frequency[residue] = global_frequency.get(residue, 0) + count
 
-    # Normalisation de la fréquence (la fréquence doit être entre -1 et 1)
+    # Normalize the frequency (the frequency should be between -1 and 1)
     for residue in global_frequency:
-        # On divise par le nombre total de frames de la simulation pour obtenir une fréquence par frame
+        # Divide by the total number of frames in the simulation to get a per-frame frequency
         global_frequency[residue] = round((global_frequency[residue] / sim_length)*100, 2)
     
-    return global_frequency  # Retourne le dictionnaire des fréquences d'interaction globales
-
+    return global_frequency  # Return the dictionary of global interaction frequencies
 
 
 def set_global_b_factors(topology, global_data, output_dir):
     """
-    Met à jour les b-factors dans le fichier PDB en utilisant les fréquences d'interaction globales.
+    Updates the b-factors in the PDB file using the global interaction frequencies.
     """
-    output_pdb = f"{output_dir}/global_interaction_frequencies.pdb"  # Définir le nom du fichier de sortie
-    parser = PDBParser(QUIET=True)  # Initialiser le parseur PDB
-    structure = parser.get_structure("protein", topology)  # Parser la structure PDB
+    output_pdb = f"{output_dir}/global_interaction_frequencies.pdb"  # Define the output file name
+    parser = PDBParser(QUIET=True)  # Initialize the PDB parser
+    structure = parser.get_structure("protein", topology)  # Parse the PDB structure
 
-    # Itération sur chaque modèle, chaîne, et résidu dans la structure
+    # Iterate over each model, chain, and residue in the structure
     for model in structure:
         for chain in model:
             for residue in chain:
-                # Créer un identifiant unique pour chaque résidu (nom, id, et segid)
+                # Create a unique identifier for each residue (name, id, and segid)
                 res_id = f"{residue.resname}_{residue.get_id()[1]}_{residue.segid}"
-                # Récupérer la fréquence d'interaction pour ce résidu, sinon utiliser -1.00 par défaut
-                b_factor = global_data.get(res_id, -1.00)  # Si aucune donnée, b-factor par défaut
-                # Appliquer la fréquence d'interaction en tant que b-factor pour chaque atome du résidu
+                # Retrieve the interaction frequency for this residue, or use -1.00 by default
+                b_factor = global_data.get(res_id, -1.00)  # Default b-factor if no data
+                # Apply the interaction frequency as the b-factor for each atom in the residue
                 for atom in residue:
                     atom.set_bfactor(b_factor)
 
-    io = PDBIO()  # Initialiser l'objet PDB pour l'écriture
-    io.set_structure(structure)  # Définir la structure à sauvegarder
-    io.save(output_pdb)  # Sauvegarder la structure mise à jour dans un fichier PDB
+    io = PDBIO()  # Initialize the PDB I/O object for writing
+    io.set_structure(structure)  # Set the structure to save
+    io.save(output_pdb)  # Save the updated structure in a PDB file
+
 
 def write_log(OUT : str, TOP : str,TRJ :str, THR : int, SKIP : int, full_dict : dict) :
     """Write and print log file.
