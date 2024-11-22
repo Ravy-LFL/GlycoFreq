@@ -116,7 +116,7 @@ def treat_fullfill_dict(protein, THR, carbs, out_infos_buffer, dict_carbs, count
             carb_atom = carbs.atoms[close_carb_indices[0]]  # First close carbohydrate atom.
             
             # Write contact info to buffer.
-            prot_id = f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"
+            prot_id = f"{atom_prot.residue.resname}_{atom_prot.residue.resnum}_{atom_prot.segid}"
             carb_info = (f"{prot_id},{carb_atom.segid},{carb_atom.resname},"
                          f"{carb_atom.resid},{carb_atom.type},{count + 1}\n")
             out_infos_buffer.append(carb_info)
@@ -267,7 +267,7 @@ def compute_global_interaction_frequency(interaction_dict, sim_length):
     # Normalisation de la fréquence (la fréquence doit être entre -1 et 1)
     for residue in global_frequency:
         # On divise par le nombre total de frames de la simulation pour obtenir une fréquence par frame
-        global_frequency[residue] = round(global_frequency[residue] / sim_length, 2)
+        global_frequency[residue] = round((global_frequency[residue] / sim_length)*100, 2)
     
     return global_frequency  # Retourne le dictionnaire des fréquences d'interaction globales
 
