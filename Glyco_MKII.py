@@ -2,11 +2,11 @@
 
     Usage
     =====
-        ./glyco_diy.py -top <topology_file> -trj <trajectory_file> -output <file_name> -threshold <threshold_interaction> -skip <number_frame_to_skip>
+        ./Glyco_MKII.py -top <topology_file> -trj <trajectory_file> -output <file_name> -threshold <threshold_interaction> -skip <number_frame_to_skip>
 """
 
 __author__ = "Ravy LEON FOUN LIN"
-__date__ = "03 - 10 - 2024"
+__date__ = "22 - 11 - 2024"
 
 import argparse
 import sys
