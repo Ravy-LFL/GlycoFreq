@@ -115,7 +115,7 @@ def treat_fullfill_dict(protein, THR, carbs, out_infos_buffer, dict_carbs, count
             carb_atom = carbs.atoms[close_carb_indices[0]]  # First close carbohydrate atom.
             
             # Write contact info to buffer.
-            prot_id = f"{atom_prot.residue.resname}_{atom_prot.residue.resnum}_{atom_prot.segid}"
+            prot_id = f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"
             carb_info = (f"{prot_id},{carb_atom.segid},{carb_atom.resname},"
                          f"{carb_atom.resid},{carb_atom.type},{count + 1}\n")
             out_infos_buffer.append(carb_info)
