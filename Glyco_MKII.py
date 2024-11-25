@@ -18,7 +18,6 @@ from math import log
 import MDAnalysis as mda
 from MDAnalysis.analysis.distances import distance_array
 from Bio.PDB import PDBParser, PDBIO
-import pickle as pkl
 import threading
 import warnings
 warnings.filterwarnings('ignore')
@@ -116,7 +115,7 @@ def treat_fullfill_dict(protein, THR, carbs, out_infos_buffer, dict_carbs, count
             carb_atom = carbs.atoms[close_carb_indices[0]]  # First close carbohydrate atom.
             
             # Write contact info to buffer.
-            prot_id = f"{atom_prot.residue.resname}_{atom_prot.residue.resid}_{atom_prot.segid}"
+            prot_id = f"{atom_prot.residue.resname}_{atom_prot.residue.resnum}_{atom_prot.segid}"
             carb_info = (f"{prot_id},{carb_atom.segid},{carb_atom.resname},"
                          f"{carb_atom.resid},{carb_atom.type},{count + 1}\n")
             out_infos_buffer.append(carb_info)
@@ -349,9 +348,6 @@ if __name__ == "__main__" :
     print("Fullfill dictionnary...")
     THR = float(THR)
     full_dict = fullfill_dict(THR, dictionnary,SKIP)
-
-    with open('dict_data_julien.pkl', 'wb') as f :
-        pkl.dump(full_dict,f)
 
     #  Frames number.
     if SKIP != 0 :
