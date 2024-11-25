@@ -46,7 +46,7 @@ Once the environment is activated, here the command line to use **Glyco-MKII** :
 
   - About the *topology*: To make the computation faster, it is possible to use the topology file with only the protein and carbohydrates. Without the solvant.
     
-  - About the *trajectory* : If the topology have no solvant, be sure that you also removed it in the trajectory file (with `gmx trjconv` for example). Also, if the use have replicas, you concatenate the trajectory files.
+  - About the *trajectory* : If the topology have no solvant, be sure that you also removed it in the trajectory file (with `gmx trjconv` for example). Also, if the user have replicas, it is possible to concatenate the trajectory files.
 
 ## Outputs.
 
