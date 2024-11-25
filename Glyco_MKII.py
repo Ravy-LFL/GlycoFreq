@@ -178,10 +178,6 @@ def fullfill_dict(THR: float, dict_carbs: dict, SKIP: int):
             out_infos.writelines(out_infos_buffer)
             out_infos_buffer.clear()
 
-    # Save the contact count dictionary to a CSV file.
-    df = pd.DataFrame.from_dict(dict_carbs, orient="index")
-    df.to_csv("out_count_carbohydrates.csv")
-
     return dict_carbs
 
 
