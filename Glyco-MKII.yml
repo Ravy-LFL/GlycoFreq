@@ -9,8 +9,6 @@ dependencies:
 - numpy
 - pandas
 - pyarrow
-- pyemma
-- pymol-bundle
 - pytz
 - scikit-learn
 - scipy
