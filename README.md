@@ -1,5 +1,5 @@
-# Glyco-MKII
-Contains code for the script Glyco-MKII. Used to compute from trajectory and topology file, the frequence of residues interacting with carbohydrates.
+# GlycoFreq
+Contains code for the script GlycoFreq. Used to compute from trajectory and topology file, the frequence of residues interacting with carbohydrates.
 It produce a csv file with the residue interacting, and the number of frames while they are interacting with the carbohydrates.
 But also a PDB file for which underline the residues interacting with the carbohydrates. With the b-factor corresponding to the frequency.
 
@@ -8,13 +8,13 @@ But also a PDB file for which underline the residues interacting with the carboh
 ### Environment.
 The wide user will create a conda environment in order to safely use this script.
 
-Using the `Glyco-MKII.yml` and the following command line, the user can easily create this environment :
+Using the `GlycoFreq.yml` and the following command line, the user can easily create this environment :
 
-`<conda/micromamba> create -n Glyco-MKII -f Glyco-MKII.yml`
+`<conda/micromamba> create -n GlycoFreq -f GlycoFreq.yml`
 
 And then :
 
-`<conda/micromamba> activate Glyco-MKII`
+`<conda/micromamba> activate GlycoFreq`
 
 ## Usage.
 
@@ -26,9 +26,9 @@ If you made your system with **CHARMM-GUI** before, you should already have this
 
 ### Environment.
 
-Once the environment is activated, here the command line to use **Glyco-MKII** :
+Once the environment is activated, here the command line to use **GlycoFreq** :
 
-`./Glyco_MKII.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction> -skip (OPTIONAL) <how_many_frames_to_skip>`
+`./GlycoFreq.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction> -skip (OPTIONAL) <how_many_frames_to_skip>`
     
 ### Arguments.
   - **top** : Indicate the path to the topology file (PDB)
@@ -72,7 +72,7 @@ Once loaded, to show color the protein depending on the frequency of interaction
 
 You can try the using the files in the **examples** folder as follow :
 
-`./Glyco_MKII.py -top examples/topology_file.pdb -trj examples/trajectory_file.xtc -output . -threshold 8`
+`./GlycoFreq.py -top examples/topology_file.pdb -trj examples/trajectory_file.xtc -output . -threshold 8`
 
 
 And will produce these outputs :
