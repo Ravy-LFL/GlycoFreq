@@ -54,8 +54,8 @@ The script produce one *csv* file.
 
 It contains precise informations about the carbohydrate in interaction with the the residue. Columns of this file => **residue**,**segid**,**carbohydrate**,**carbohydrate_number**,**group**,**frame**.
 
-It produced PDB file of the input protein, but with the b-factor replaced by the percentage of time that a residue was a contact with the carbohydrate.
-One PDB file is produce by carbohydrate.
+It produced PDB file of the input protein, but with the b-factor replaced by the percentage of time that a residue was a contact with the query carbohydrate.
+One PDB file is produce by carbohydrate. The file is called **contact_with_<segid_of_carbohydrate>.pdb**.
 
 And finally a PDB file of the protein called `global_interaction_frequencies.pdb` is made. This PDB file have the global interactions made by the whole carbohydrates, in the B-factor columns.
 
