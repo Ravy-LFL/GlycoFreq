@@ -43,7 +43,7 @@ else :
         SKIP = 0
 
 
-def Universe(TOP : str,TRJ : str) :
+def Universe(TOP : str,TRJ : str) -> mda.Universe :
     """Set Universe.
 
         Parameters
@@ -59,12 +59,10 @@ def Universe(TOP : str,TRJ : str) :
     """
 
     #  Define Universe.
-    u = mda.Universe(TOP,TRJ)
-
-    return u
+    return mda.Universe(TOP,TRJ)
 
 
-def create_dictionnary(u) :
+def create_dictionnary(u : mda.Universe) -> dict[str,dict] :
     """Create Dictionnary of count.
 
         Parameters
@@ -77,26 +75,13 @@ def create_dictionnary(u) :
             Format : {"Carbohydrate_ID" : {'residue':count,...}}
     """
 
-    #  Create empty dictionnary.
-    dict_carbs = {}
-
-    #  Fullfill with carbohydrate segid as key and dict of amino acid as values.
-    for segment in u.segments :
-
-        #  Get ID treated.
-        ID = segment.segid
-
-        #  Check if it is carb
-        if ID[:3] == 'CAR' :
-            #  Create key-value
-            dict_carbs[ID] = {}
-
     #  Return dict.
-    return dict_carbs
+    return {segment.segid: {} for segment in u.segments if segment.segid.startswith('CAR')}
 
 
 
-def treat_fullfill_dict(protein, THR, carbs, out_infos_buffer, dict_carbs, count):
+
+def treat_fullfill_dict(protein : mda.AtomGroup , THR : float, carbs : mda.AtomGroup , out_infos_buffer : list, dict_carbs : dict, count : int):
     """
     Process a single carbohydrate to compute contacts with the protein and update the dictionary.
     """
@@ -116,7 +101,7 @@ def treat_fullfill_dict(protein, THR, carbs, out_infos_buffer, dict_carbs, count
             # Write contact info to buffer.
             prot_id = f"{atom_prot.residue.resname}_{atom_prot.residue.resnum}_{atom_prot.segid}"
             carb_info = (f"{prot_id},{carb_atom.segid},{carb_atom.resname},"
-                         f"{carb_atom.resid},{carb_atom.type},{count + 1}\n")
+                         f"{carb_atom.resid},{carb_atom.type},{count}\n")
             out_infos_buffer.append(carb_info)
 
             # Update dictionary.
@@ -241,7 +226,7 @@ def set_new_b_factor(TOP : str, new_b_factors : dict, length_sim : int, carb : s
 
     return 0
 
-def compute_global_interaction_frequency(interaction_dict, sim_length):
+def compute_global_interaction_frequency(interaction_dict : dict, sim_length : int):
     """
     Compute the global interaction frequency (normalized) for each residue.
     
@@ -266,7 +251,7 @@ def compute_global_interaction_frequency(interaction_dict, sim_length):
     return global_frequency  # Return the dictionary of global interaction frequencies
 
 
-def set_global_b_factors(topology, global_data, output_dir):
+def set_global_b_factors(topology : str, global_data : dict, output_dir : str):
     """
     Updates the b-factors in the PDB file using the global interaction frequencies.
     """
