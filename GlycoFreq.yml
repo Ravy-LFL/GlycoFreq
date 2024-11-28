@@ -1,0 +1,15 @@
+name: GlycoFreq
+channels:
+- anaconda
+- conda-forge
+- schrodinger
+dependencies:
+- ipykernel
+- msmtools
+- numpy
+- pandas
+- pyarrow
+- pytz
+- scikit-learn
+- scipy
+- tqdm
