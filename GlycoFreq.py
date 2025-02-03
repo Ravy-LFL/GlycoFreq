@@ -7,8 +7,8 @@ Usage
     ./optimized_glycofreq.py -top <topology_file> -trj <trajectory_file> -output <output_directory> -threshold <threshold_interaction> -skip <number_frame_to_skip>
 """
 
-__author__ = "Ravy LEON FOUN LIN (optimisé)"
-__date__ = "22-11-2024 (optimisé le 03-02-2025)"
+__author__ = "Ravy LEON FOUN LIN (optimized)"
+__date__ = "22-11-2024 (optimized on 03-02-2025)"
 
 import argparse
 import sys
@@ -20,12 +20,12 @@ import threading
 import warnings
 warnings.filterwarnings('ignore')
 
-# Import de la fonction Cython
+# Import the Cython function
 import pyximport
 pyximport.install(setup_args={"include_dirs": np.get_include()}, language_level=3)
 import glyco_distance
 
-# --- Parsing des arguments ---
+# --- Argument Parsing ---
 parser = argparse.ArgumentParser(prog='GlycoFreq',
                                  description='Compute frequency of carbohydrate-protein interactions and set them as B-factor values in a new PDB structure.')
 parser.add_argument("-top", help="Path to topology file.", required=True)
@@ -42,29 +42,29 @@ OUT = args.output
 THR = float(args.threshold)
 SKIP = int(args.skip)
 
-# --- Fonctions principales ---
+# --- Main Functions ---
 
 def Universe(top: str, trj: str) -> mda.Universe:
-    """Crée l'objet Universe à partir des fichiers topologie et trajectoire."""
+    """Creates the Universe object from topology and trajectory files."""
     return mda.Universe(top, trj)
 
 def create_dictionary(u: mda.Universe) -> dict:
-    """Crée un dictionnaire initial pour stocker les comptes de contacts pour chaque sucre.
-    Format : {"Carbohydrate_ID": { "residue_id": count, ... } }
+    """Creates an initial dictionary to store contact counts for each carbohydrate.
+    Format: {"Carbohydrate_ID": { "residue_id": count, ... } }
     """
     return {segment.segid: {} for segment in u.segments if segment.segid.startswith('CAR')}
 
 def treat_fullfill_dict(protein: mda.AtomGroup, THR: float, carbs: mda.AtomGroup, out_infos_buffer: list, dict_carbs: dict, frame_number: int):
     """
-    Pour un segment sucré donné, calcule les contacts avec la protéine en utilisant
-    la fonction Cython optimisée et met à jour le dictionnaire.
+    For a given carbohydrate segment, calculates the contacts with the protein using
+    the optimized Cython function and updates the dictionary.
     """
-    # Récupération des positions sous forme de tableaux contigus
+    # Retrieve positions as contiguous arrays
     carb_positions = np.ascontiguousarray(np.array(carbs.positions, dtype=np.float64))
     protein_positions = np.ascontiguousarray(np.array(protein.positions, dtype=np.float64))
     
-    # Appel à la fonction Cython pour obtenir, pour chaque atome de la protéine,
-    # l’indice du premier atome du sucre en contact (ou -1 s'il n'y a pas de contact).
+    # Call the Cython function to obtain, for each protein atom,
+    # the index of the first contacting carbohydrate atom (or -1 if no contact).
     contacts = glyco_distance.compute_contacts(protein_positions, carb_positions, THR)
     
     for i, atom_prot in enumerate(protein.atoms):
@@ -80,24 +80,24 @@ def treat_fullfill_dict(protein: mda.AtomGroup, THR: float, carbs: mda.AtomGroup
 
 def fullfill_dict(THR: float, dict_carbs: dict, SKIP: int, u: mda.Universe):
     """
-    Parcourt la trajectoire et cumule le nombre de contacts par résidu pour chaque sucre.
-    Ne compte que les frames effectivement traitées (c'est-à-dire celles qui ne sont pas ignorées).
-    Retourne le dictionnaire complété et le nombre de frames traitées.
+    Iterates through the trajectory and accumulates the number of contacts per residue for each carbohydrate.
+    Only processes the frames that are not skipped.
+    Returns the completed dictionary and the number of processed frames.
     """
-    # Sélection des sucres (exclusion des hydrogènes)
+    # Select carbohydrates (excluding hydrogens)
     input_carbs_list = [u.select_atoms(f"segid {carb} and not type H") for carb in dict_carbs.keys()]
-    # Sélection des atomes CA de la protéine
+    # Select CA atoms of the protein
     protein = u.select_atoms("name CA")
     
-    frame_number = 0      # Compteur du numéro de frame dans la trajectoire
-    processed_frames = 0  # Nombre de frames réellement traitées
+    frame_number = 0      # Frame counter in the trajectory
+    processed_frames = 0  # Number of frames actually processed
     out_infos_buffer = []
     
     with open("infos_carbos_residue.csv", "w") as out_infos:
         out_infos.write("residue,segid,carbohydrate,carbohydrate_number,group,frame\n")
         for ts in tqdm(u.trajectory, desc="Processing trajectory"):
             frame_number += 1
-            # Appliquer le skip : traiter uniquement les frames où (frame_number - 1) % SKIP == 0
+            # Apply skip: process only frames where (frame_number - 1) % SKIP == 0
             if SKIP and (frame_number - 1) % SKIP != 0:
                 continue
 
@@ -117,20 +117,36 @@ def fullfill_dict(THR: float, dict_carbs: dict, SKIP: int, u: mda.Universe):
 
 def compute_global_interaction_frequency(interaction_dict: dict, processed_frames: int):
     """
-    Calcule la fréquence globale (normalisée) d'interaction pour chaque résidu.
-    La fréquence est définie comme (nombre d'interactions / nombre de frames traitées) * 100.
+    Calculates the global (normalized) interaction frequency for each residue.
+    The frequency is defined as (number of interactions / number of processed frames) * 100.
     """
     global_frequency = {}
     for carb_data in interaction_dict.values():
         for residue, count in carb_data.items():
             global_frequency[residue] = global_frequency.get(residue, 0) + count
     for residue in global_frequency:
-        global_frequency[residue] = round((global_frequency[residue] / processed_frames) * 100, 2)
+        global_frequency[residue] = round((global_frequency[residue] / processed_frames), 2)
     return global_frequency
+
+def write_log(out_dir: str, top: str, trj: str, thr: float, skip: int, full_dict: dict):
+    """Writes a log file summarizing the parameters and results."""
+    log = f"""
+    OUTPUT PATH            : {out_dir}
+    TOPOLOGY FILE PATH     : {top}
+    TRAJECTORY FILE PATH   : {trj}
+    THRESHOLD OF CONTACT   : {thr} Å
+    NUMBER OF FRAMES SKIPPED: {skip}
+    NUMBER OF CARBOHYDRATES : {len(full_dict.keys())}
+    CARBOHYDRATE IDs       : {[i for i in full_dict.keys()]}
+    """
+    with open(f"{out_dir}/glyco.log", "w") as f:
+        f.write(log)
+    print(log)
+    return 0
 
 def set_new_b_factor(top: str, new_b_factors: dict, sim_length: int, carb: str, out_dir: str):
     """
-    Crée une nouvelle structure PDB en affectant pour chaque résidu le pourcentage d'interaction en tant que B-factor.
+    Create new PDB File where the B-factor is replaced by the frequence of the carbohydrate with the residue.
     """
     output_pdb = f"{out_dir}/contact_with_{carb}.pdb"
     parser = PDBParser(QUIET=True)
@@ -144,7 +160,7 @@ def set_new_b_factor(top: str, new_b_factors: dict, sim_length: int, carb: str, 
                 segid = residue.segid
                 name = f"{resn}_{resid}_{segid}"
                 if name in new_b_factors[carb]:
-                    new_bfs = round((new_b_factors[carb][name] / sim_length) * 100, 2)
+                    new_bfs = round((new_b_factors[carb][name] / sim_length), 2)
                 else:
                     new_bfs = -1.00
                 for atom in residue:
@@ -156,7 +172,7 @@ def set_new_b_factor(top: str, new_b_factors: dict, sim_length: int, carb: str, 
 
 def set_global_b_factors(topology: str, global_data: dict, output_dir: str):
     """
-    Met à jour les B-factors dans le fichier PDB en utilisant la fréquence d'interaction globale.
+    Update the B-factor with the global coverage of every carbohydrates.
     """
     output_pdb = f"{output_dir}/global_interaction_frequencies.pdb"
     parser = PDBParser(QUIET=True)
@@ -174,21 +190,6 @@ def set_global_b_factors(topology: str, global_data: dict, output_dir: str):
     io.set_structure(structure)
     io.save(output_pdb)
 
-def write_log(out_dir: str, top: str, trj: str, thr: float, skip: int, full_dict: dict):
-    """Écrit un fichier log résumant les paramètres et résultats."""
-    log = f"""
-OUTPUT PATH            : {out_dir}
-TOPOLOGY FILE PATH     : {top}
-TRAJECTORY FILE PATH   : {trj}
-THRESHOLD OF CONTACT   : {thr} Å
-NUMBER OF FRAMES SKIPPED: {skip}
-NUMBER OF CARBOHYDATES : {len(full_dict.keys())}
-CARBOHYDATES IDs       : {[i for i in full_dict.keys()]}
-"""
-    with open(f"{out_dir}/glyco.log", "w") as f:
-        f.write(log)
-    print(log)
-    return 0
 
 # --- Exécution principale ---
 if __name__ == "__main__":
