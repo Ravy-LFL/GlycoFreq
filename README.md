@@ -10,7 +10,9 @@ The wide user will create a conda environment in order to safely use this script
 
 Using the `GlycoFreq.yml` and the following command line, the user can easily create this environment :
 
-`<conda/micromamba> create -n GlycoFreq -f GlycoFreq.yml`
+`<conda/micromamba> env create -n GlycoFreq -f GlycoFreq.yml`
+`<conda/micromamba> activate GlycoFreq`
+`pip install cython`
 
 And then :
 
