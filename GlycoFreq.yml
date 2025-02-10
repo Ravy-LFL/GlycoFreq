@@ -2,10 +2,9 @@ name: GlycoFreq
 channels:
 - anaconda
 - conda-forge
-- schrodinger
 dependencies:
+- cython
 - ipykernel
-- msmtools
 - numpy
 - pandas
 - pyarrow
@@ -13,4 +12,4 @@ dependencies:
 - scikit-learn
 - scipy
 - tqdm
-- cython
+- mdanalysis
