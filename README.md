@@ -41,7 +41,7 @@ Once the environment is activated, here the command line to use **GlycoFreq** :
 
   - **output** : Indicate the path to the output files. 
 
-  - **threshold** : Indicate the threshold to count a distance as a contact between a heavy atoms of the carbohydrates and the residues.
+  - **threshold** : Indicate the threshold to count a distance as a contact between an heavy atoms of the carbohydrates and the residues alpha carbon. 8.0 by default.
 
   - **skip** : Indicate how many frames to skip. **OPTIONAL** 0 by default.
 

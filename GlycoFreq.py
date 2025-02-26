@@ -4,11 +4,12 @@ Used to measure the presence of carbohydrate on a structure.
 
 Usage
 =====
-    ./optimized_glycofreq.py -top <topology_file> -trj <trajectory_file> -output <output_directory> -threshold <threshold_interaction> -skip <number_frame_to_skip>
+    ./GlycoFreq.py -top <topology_file> -trj <trajectory_file> -output <output_directory> -threshold <threshold_interaction> -skip <number_frame_to_skip>
 """
 
-__author__ = "Ravy LEON FOUN LIN (optimized)"
-__date__ = "22-11-2024 (optimized on 03-02-2025)"
+__author__ = "Ravy LEON FOUN LIN"
+__date__ = "03-02-2025"
+__version__ = "2.0"
 
 import argparse
 import sys
@@ -18,6 +19,7 @@ import MDAnalysis as mda
 from Bio.PDB import PDBParser, PDBIO
 import threading
 import warnings
+import os
 warnings.filterwarnings('ignore')
 
 # Import the Cython function
@@ -31,7 +33,7 @@ parser = argparse.ArgumentParser(prog='GlycoFreq',
 parser.add_argument("-top", help="Path to topology file.", required=True)
 parser.add_argument("-trj", help="Path to trajectory file.", required=True)
 parser.add_argument("-output", help="Output directory.", required=True)
-parser.add_argument("-threshold", help="Threshold of contact.", required=True)
+parser.add_argument("-threshold", help="Threshold of contact.", required=True, default="8.0")
 parser.add_argument("-skip", help="Number of frames to skip (default: 0).", default="0")
 
 args = parser.parse_args()
@@ -193,6 +195,11 @@ def set_global_b_factors(topology: str, global_data: dict, output_dir: str):
 
 # --- Exécution principale ---
 if __name__ == "__main__":
+
+    if not os.path.isdir(OUT):
+        os.mkdir(OUT)
+
+
     print("Loading Universe...")
     u = Universe(TOP, TRJ)
     
