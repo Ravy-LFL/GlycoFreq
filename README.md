@@ -28,14 +28,19 @@ This will give you a file named `step1_pdbreader.pdb`.
 This step is needed in order to 'mark' each carbohydrates with a SEGID, that is used by the script to retrieve the carbohydrates.
 If you made your system with **CHARMM-GUI** before, you should already have this file from the .zip they provided. You can also use the file named `step3_input.pdb`, which contains also the water and ions.
 
+### (ALTERNATIVE USAGE TO CHARMM-GUI).
+If you cannot use CHARMM-GUI to set the segids of the carbohydrates, you can use a **configuration file**.
+An example of configuration file is provided in `./examples/input.config`. Just be sure to respect the format present in the file:
+`CAR(whatever):{RESIDUENAME}_{RESIDUENUMBER}_{CHAINID}`
+
 ### Environment.
 
 Once the environment is activated, here the command line to use **GlycoFreq** :
 
-`./GlycoFreq.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction> -skip (OPTIONAL) <how_many_frames_to_skip>`
+`./GlycoFreq.py -top <topology_file> -trj <trajectory_file> -output <output_path> -threshold <threshold_interaction> -skip (OPTIONAL) <how_many_frames_to_skip> -config <path_configuration_file>`
     
 ### Arguments.
-  - **top** : Indicate the path to the topology file (PDB)
+  - **top** : Indicate the path to the topology file (PDB).
 
   - **trj** : Indicate the path to the trajectory file (XTC,DCD,TRR...).
 
@@ -44,6 +49,8 @@ Once the environment is activated, here the command line to use **GlycoFreq** :
   - **threshold** : Indicate the threshold to count a distance as a contact between an heavy atoms of the carbohydrates and the residues alpha carbon. 8.0 by default.
 
   - **skip** : Indicate how many frames to skip. **OPTIONAL** 0 by default.
+
+  - **config** : Path to the configuration file. **OPTIONAL**.
 
 
 **COOL TRICKS ABOUT TRAJECTORY AND TOPOLOGY FILES** :

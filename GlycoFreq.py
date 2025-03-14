@@ -4,7 +4,7 @@ Used to measure the presence of carbohydrate on a structure.
 
 Usage
 =====
-    ./GlycoFreq.py -top <topology_file> -trj <trajectory_file> -output <output_directory> -threshold <threshold_interaction> -skip <number_frame_to_skip>
+    ./GlycoFreq.py -top <topology_file> -trj <trajectory_file> -output <output_directory> -threshold <threshold_interaction> -skip <number_frame_to_skip> -config <path_config_file>
 """
 
 __author__ = "Ravy LEON FOUN LIN"
