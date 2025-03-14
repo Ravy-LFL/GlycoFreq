@@ -35,6 +35,7 @@ parser.add_argument("-trj", help="Path to trajectory file.", required=True)
 parser.add_argument("-output", help="Output directory.", required=True)
 parser.add_argument("-threshold", help="Threshold of contact.", required=True, default="8.0")
 parser.add_argument("-skip", help="Number of frames to skip (default: 0).", default="0")
+parser.add_argument("-config",help="Input config file that can be used if no SEGID.", default=False)
 
 args = parser.parse_args()
 
@@ -43,7 +44,7 @@ TRJ = args.trj
 OUT = args.output
 THR = float(args.threshold)
 SKIP = int(args.skip)
-
+CONFIG = args.config
 # --- Main Functions ---
 
 def Universe(top: str, trj: str) -> mda.Universe:
@@ -55,6 +56,35 @@ def create_dictionary(u: mda.Universe) -> dict:
     Format: {"Carbohydrate_ID": { "residue_id": count, ... } }
     """
     return {segment.segid: {} for segment in u.segments if segment.segid.startswith('CAR')}
+
+def set_segid(CONFIG: str, TOP: str, TRJ: str) -> mda.Universe:
+    """
+    Affect segid to the carbohydrates depending on the config file.
+    """
+
+    # Load universe.
+    u = mda.Universe(TOP, TRJ)
+
+    # Read and treat the configuration file.
+    with open(CONFIG, 'r') as f:
+        segid_to_residues = {
+            line.split(':')[0]: [tuple(res.strip().split('_')) for res in line.split(':')[1].split(',')]
+            for line in f
+            if line.strip() and not line.startswith('#')
+        }
+
+    # Affect the segid.
+    for segid, residues in segid_to_residues.items():
+        for resn, resi, chain in residues:
+            atoms = u.select_atoms(f"resname {resn} and resid {resi} and chainID {chain}")
+            # Affect the segid at every atoms selected.
+            atoms.segments.segids = [segid] * atoms.n_segments
+
+    return u
+
+
+
+
 
 def treat_fullfill_dict(protein: mda.AtomGroup, THR: float, carbs: mda.AtomGroup, out_infos_buffer: list, dict_carbs: dict, frame_number: int):
     """
@@ -200,11 +230,17 @@ if __name__ == "__main__":
         os.mkdir(OUT)
 
 
-    print("Loading Universe...")
-    u = Universe(TOP, TRJ)
     
+    if type(CONFIG) == str:
+        print("Read config file and Loading Universe...")
+        u = set_segid(CONFIG,TOP,TRJ)
+    elif CONFIG == False:
+        print("Loading Universe...")
+        u = Universe(TOP, TRJ)
+
     print("Creating dictionary...")
     full_dict = create_dictionary(u)
+
     
     print("Fulfilling dictionary with contact counts...")
     full_dict, processed_frames = fullfill_dict(THR, full_dict, SKIP, u)
